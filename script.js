@@ -1,12 +1,12 @@
 const url = "https://hexschool.github.io/js-filter-data/data.json";
 const showList = document.querySelector(".showList");
 const showResult = document.querySelector(".show-result");
-const search_input = document.querySelector("#crop");
-const search_btn = document.querySelector(".search");
-const btn_gruop = document.querySelector(".button-group");
-const sort_selected = document.querySelector(".sort-select");
-const sort_mobile = document.querySelector(".mobile-select");
-const sort_advanced = document.querySelector(".js-sort-advanced");
+const searchInput = document.querySelector("#crop");
+const btnSearch = document.querySelector(".search");
+const btnGroup = document.querySelector(".button-group");
+const sortSelected = document.querySelector(".sort-select");
+const sortMobile = document.querySelector(".mobile-select");
+const sortAdvanced = document.querySelector(".js-sort-advanced");
 
 let data = [];
 let filteredData = [];
@@ -55,13 +55,13 @@ const renderData = () => {
 };
 
 //依照輸入作物名稱搜尋
-search_btn.addEventListener("click", () => {
+btnSearch.addEventListener("click", () => {
   resetSortSelect();
   searchCrop();
 });
 
 const searchCrop = () => {
-  if (search_input.value.trim() === "") {
+  if (searchInput.value.trim() === "") {
     alert("請先輸入內容");
     return;
   }
@@ -71,7 +71,7 @@ const searchCrop = () => {
   });
   filteredData = data.filter((item) => {
     if (item.作物名稱 !== null) {
-      return item.作物名稱.match(search_input.value.trim());
+      return item.作物名稱.match(searchInput.value.trim());
     }
   });
   search_type = "searching";
@@ -103,15 +103,15 @@ const changeType = () => {
     filteredData = data.filter((item) => {
       return item.種類代碼 === search_type;
     });
-
-    renderData();
   });
+
+  renderData();
 };
 
-btn_gruop.addEventListener("click", (e) => {
+btnGroup.addEventListener("click", (e) => {
   if (e.target.nodeName === "BUTTON") {
     search_type = e.target.dataset.type;
-    search_input.value = "";
+    searchInput.value = "";
     resetSortSelect();
     changeType();
   }
@@ -134,17 +134,17 @@ const changeSort = (sort_type, sort_method) => {
 };
 
 const resetSortSelect = () => {
-  sort_selected.value = "default";
-  sort_mobile.value = "default";
+  sortSelected.value = "default";
+  sortMobile.value = "default";
 };
 
-sort_selected.addEventListener("change", (e) => {
+sortSelected.addEventListener("change", (e) => {
   changeSort(e.target.value, "up");
   renderData();
 });
 
 //表頭箭頭遞增排序、遞減排序
-sort_advanced.addEventListener("click", (e) => {
+sortAdvanced.addEventListener("click", (e) => {
   if (e.target.nodeName === "I") {
     resetSortSelect();
     let price = e.target.dataset.price;
@@ -155,7 +155,7 @@ sort_advanced.addEventListener("click", (e) => {
 });
 
 //行動裝置畫面排序
-sort_mobile.addEventListener("change", (e) => {
+sortMobile.addEventListener("change", (e) => {
   changeSort(e.target.value, "up");
   renderData();
 });
