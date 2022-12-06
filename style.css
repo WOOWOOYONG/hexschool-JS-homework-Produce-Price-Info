@@ -56,7 +56,7 @@ i:hover {
 .main {
   background: #fff;
   border: 5px solid #fff8d45a;
-  padding: 2.5rem;
+  padding: 1rem 2.5rem;
 }
 @media (max-width: 767px) {
   .main {
@@ -174,4 +174,47 @@ i:hover {
 .fa-caret-down {
   top: 9px;
   right: -15px;
+}
+
+/*pagination*/
+.table-page {
+  display: flex;
+  justify-content: center;
+}
+
+.table-page li {
+  list-style-type: none;
+  margin: 5px;
+}
+
+.table-page.visible {
+  visibility: visible;
+}
+
+.table-page li {
+  background: #ffffff;
+  border: 1px solid #899e39;
+  padding: 2px 8px;
+  list-style-type: none;
+}
+
+.table-page li:first-child {
+  border-radius: 5px 0 0 5px;
+}
+
+.table-page li:last-child {
+  border-radius: 0 5px 5px 0;
+}
+
+.table-page li.page-active {
+  background: #899e39;
+}
+
+.table-page li.page-not-active {
+  color: lightgray;
+}
+
+.table-page li:hover:not(.page-not-active) {
+  cursor: pointer;
+  background: rgba(143, 158, 57, 0.3);
 }

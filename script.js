@@ -7,10 +7,17 @@ const btnGroup = document.querySelector(".button-group");
 const sortSelected = document.querySelector(".sort-select");
 const sortMobile = document.querySelector(".mobile-select");
 const sortAdvanced = document.querySelector(".js-sort-advanced");
+const pagination = document.querySelector(".table-page");
 
-let data = [];
-let filteredData = [];
-let search_type = "";
+let data = []; //儲存從API取得資料
+let filteredData = []; //儲存分類後的資料
+let search_type = ""; //儲存當前搜尋類別
+
+//資料分頁用
+let currentPage = 1; // 儲存當前頁面
+let currentPageGroup = 1; // 儲存當前渲染頁面組別 ( 每１０頁１組 )
+let perPage = 20; // 儲存每頁顯示資料數
+let totalPage = 0; // 儲存總頁數
 
 //取得API資料
 const getApiData = () => {
@@ -37,7 +44,11 @@ const renderData = () => {
         </tr>
         `;
   } else {
-    filteredData.forEach((item) => {
+    let currentPageData = filteredData.slice(
+      (currentPage - 1) * perPage,
+      currentPage * perPage
+    );
+    currentPageData.forEach((item) => {
       result += `<tr>
             <td>${item.作物名稱}</td>
             <td>${item.市場名稱}</td>
@@ -75,9 +86,11 @@ const searchCrop = () => {
     }
   });
   search_type = "searching";
+  currentPage = 1;
   loading();
   setTimeout(() => {
     renderData();
+    renderPage();
   }, 500);
 };
 
@@ -104,8 +117,9 @@ const changeType = () => {
       return item.種類代碼 === search_type;
     });
   });
-
+  currentPage = 1;
   renderData();
+  renderPage();
 };
 
 btnGroup.addEventListener("click", (e) => {
@@ -159,3 +173,83 @@ sortMobile.addEventListener("change", (e) => {
   changeSort(e.target.value, "up");
   renderData();
 });
+
+// 渲染頁碼
+function renderPage() {
+  let str = "";
+  let page = [];
+  totalPage = Math.ceil(filteredData.length / perPage);
+  currentPageGroup = Math.ceil(currentPage / 10);
+  if (filteredData.length === 0) {
+    str = "";
+  } else {
+    if (currentPageGroup == Math.ceil(totalPage / 10)) {
+      for (let i = currentPageGroup * 10 - 9; i <= totalPage; i++) {
+        page += `<li class="page" data-page=${i} onclick="pageChange(${i})">${i}</li>`;
+      }
+    } else {
+      for (let i = currentPageGroup * 10 - 9; i <= currentPageGroup * 10; i++) {
+        page += `<li class="page" data-page=${i} onclick="pageChange(${i})">${i}</li>`;
+      }
+    }
+    str += `
+    <li class="page-prev-ten" data-page=0 onclick="pageChange(currentPage - 10)"><i class="fas fa-angle-double-left"></i></li>
+    <li class="page-prev" data-page=0 onclick="pageChange(currentPage - 1)"><i class="fas fa-angle-left"></i></li>
+    ${page}
+    <li class="page-next" data-page=0 onclick="pageChange(currentPage + 1)"><i class="fas fa-angle-right"></i></li>
+    <li class="page-next-ten" data-page=0 onclick="pageChange(currentPage + 10)"><i class="fas fa-angle-double-right"></i></li>
+    `;
+  }
+  pagination.innerHTML = str;
+  pagination.classList.add("visible");
+  pageStyle();
+}
+
+// 頁碼樣式變化
+function pageStyle() {
+  const pages = pagination.querySelectorAll(".page");
+  pages[0].classList.add("page-active");
+  pagination.querySelector(".page-prev").classList.remove("page-not-active");
+  pagination.querySelector(".page-next").classList.remove("page-not-active");
+  pagination
+    .querySelector(".page-prev-ten")
+    .classList.remove("page-not-active");
+  pagination
+    .querySelector(".page-next-ten")
+    .classList.remove("page-not-active");
+
+  if (currentPage == 1 && totalPage == 1) {
+    pagination.querySelector(".page-prev").classList.add("page-not-active");
+    pagination.querySelector(".page-next").classList.add("page-not-active");
+    pagination.querySelector(".page-prev-ten").classList.add("page-not-active");
+    pagination.querySelector(".page-next-ten").classList.add("page-not-active");
+  } else if (currentPage == totalPage) {
+    pagination.querySelector(".page-next").classList.add("page-not-active");
+    pagination.querySelector(".page-next-ten").classList.add("page-not-active");
+  } else if (currentPageGroup == 1 && currentPage == 1) {
+    pagination.querySelector(".page-prev-ten").classList.add("page-not-active");
+    pagination.querySelector(".page-prev").classList.add("page-not-active");
+  } else if (currentPageGroup == 1) {
+    pagination.querySelector(".page-prev-ten").classList.add("page-not-active");
+  }
+  pages.forEach((item) => {
+    item.classList.remove("page-active");
+    if (currentPage == item.getAttribute("data-page")) {
+      item.classList.add("page-active");
+    }
+  });
+}
+
+// 變更頁碼
+function pageChange(value) {
+  if (value <= 0) {
+    currentPage = 1;
+  } else if (value >= totalPage) {
+    currentPage = totalPage;
+  } else {
+    currentPage = value;
+  }
+  renderPage(data);
+  pageStyle();
+  renderData();
+}
